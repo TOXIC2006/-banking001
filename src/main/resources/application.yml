@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: banking-monolith
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/banking?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+      minimum-idle: 2
+      connection-timeout: 30000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        order_inserts: true
+        order_updates: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/banking}
+      auto-index-creation: true
+  task:
+    execution:
+      pool:
+        core-size: 4
+        max-size: 16
+        queue-capacity: 500
+      thread-name-prefix: notification-
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+
+banking:
+  security:
+    jwt-secret: ${JWT_SECRET:change-this-development-secret-before-production-32chars}
+    jwt-expiration: ${JWT_EXPIRATION:PT30M}
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080}
+    rate-limit:
+      requests: ${RATE_LIMIT_REQUESTS:100}
+      window: ${RATE_LIMIT_WINDOW:PT1M}
+      login-requests: ${LOGIN_RATE_LIMIT_REQUESTS:10}
+  fraud:
+    single-transaction-limit: ${FRAUD_SINGLE_LIMIT:100000.00}
+    daily-transaction-limit: ${FRAUD_DAILY_LIMIT:250000.00}
+    velocity-count: ${FRAUD_VELOCITY_COUNT:10}
+  notifications:
+    reminder-delay-ms: ${REMINDER_DELAY_MS:60000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
