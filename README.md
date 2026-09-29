@@ -1,11 +1,13 @@
 # SecureBank Modular Monolith
 
-A Spring Boot 3 / Java 21 banking backend organized as an in-process, package-by-feature monolith. It preserves the original service boundaries without service discovery, an API gateway, network clients, or distributed-transaction claims.
+A full-stack digital banking application with a Spring Boot 3 / Java 21 modular monolith and a responsive React + Vite client. It preserves the original service boundaries without service discovery, an API gateway, network clients, or distributed-transaction claims.
 
 ## Architecture
 
 ```text
-HTTP
+React SPA (responsive dashboard, transfers, payments, KYC, statements)
+  |
+HTTP / relative `/api` requests
   |
   +-- Central Spring Security (JWT + CORS + rate limiting + authorization)
   |
@@ -31,6 +33,7 @@ An intra-bank movement, both ledger entries, and both balance updates share one 
 
 - JDK 21
 - Maven 3.9+ (or `./mvnw`)
+- Node.js 20+ and npm 10+ for frontend development (the Maven package build installs its own pinned Node runtime)
 - Docker with Compose for local databases
 
 ## Configuration and startup
@@ -45,6 +48,16 @@ docker compose --env-file .env up -d
 set -a; source .env; set +a
 ./mvnw spring-boot:run
 ```
+
+For frontend development, start Vite in a second terminal. It proxies relative `/api` and `/actuator` requests to Spring Boot on port 8080:
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+Open `http://localhost:5173`. The production frontend uses the supplied palette (`#082F49`, `#0E7490`, `#22C55E`, `#BAE6FD`, `#F0FDFF`) and is built automatically into the Spring Boot JAR by `./mvnw clean package`.
 
 The supplied MySQL user is supported through `DB_USERNAME=root`; put the supplied password in the ignored `.env` file as `DB_PASSWORD`. Do not add it to `application.yml`.
 
@@ -115,6 +128,10 @@ The included sandbox gateway settles normally and deliberately fails beneficiari
 ## Tests and package
 
 ```bash
+# React production bundle
+cd frontend && npm ci && npm run build && cd ..
+
+# Backend, architecture tests, and full production package
 ./mvnw test
 ./mvnw clean package
 ```

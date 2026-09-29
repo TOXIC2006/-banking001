@@ -1,0 +1,11 @@
+{
+  "name": "SecureBank Digital Banking",
+  "short_name": "SecureBank",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F0FDFF",
+  "theme_color": "#082F49",
+  "icons": [
+    {"src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}
